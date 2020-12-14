@@ -65,8 +65,10 @@ def _draw_network(mode='gnp', G=None, solution=None, n=0, edge_data=None):
     pos = nx.spring_layout(G)
     nx.draw_networkx(G, node_color=colors, node_size=600, alpha=1., pos=pos)
 
-def _maxcut_brute(G, w):
+def maxcut_brute(G):
     n = len(G.nodes())
+    w = nx.adjacency_matrix(G).toarray()
+
     # brute-force maxcut
     best_cost_brute = 0
     for b in range(2**n):
@@ -91,7 +93,7 @@ def _gnp_params(node, prob, seed=None):
     w = nx.adjacency_matrix(G).toarray()
     n_edge = len(G.edges())
     shift = -n_edge/2
-    cost, solution = _maxcut_brute(G, w)
+    cost, solution = maxcut_brute(G, w)
 
     _draw_network(mode='gnp', G=G, solution=solution)
 
@@ -107,7 +109,7 @@ def _reg_params(degree, node, seed=None):
     w = nx.adjacency_matrix(G).toarray()
     n_edge = len(G.edges())
     shift = -n_edge/2
-    cost, solution = _maxcut_brute(G, w)
+    cost, solution = maxcut_brute(G, w)
 
     _draw_network(mode='reg', G=G, solution=solution)
 
