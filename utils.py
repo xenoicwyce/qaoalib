@@ -1,7 +1,5 @@
 import warnings
 import networkx as nx
-import random
-import math
 
 
 def get_info(filename, indicator, mode='get-numeric'):
@@ -90,10 +88,9 @@ def _gnp_params(node, prob, seed=None):
     G = nx.fast_gnp_random_graph(node, prob, seed=seed)
     print('Gnp instance: node=%d, prob=%s' % (node, prob))
 
-    w = nx.adjacency_matrix(G).toarray()
     n_edge = len(G.edges())
     shift = -n_edge/2
-    cost, solution = maxcut_brute(G, w)
+    cost, solution = maxcut_brute(G)
 
     _draw_network(mode='gnp', G=G, solution=solution)
 
@@ -106,10 +103,9 @@ def _reg_params(degree, node, seed=None):
     G = nx.random_regular_graph(degree, node, seed=seed)
     print(f'Regular instance: node={node}, deg={degree}')
 
-    w = nx.adjacency_matrix(G).toarray()
     n_edge = len(G.edges())
     shift = -n_edge/2
-    cost, solution = maxcut_brute(G, w)
+    cost, solution = maxcut_brute(G)
 
     _draw_network(mode='reg', G=G, solution=solution)
 
@@ -148,7 +144,23 @@ def extract_from_filename(filename, data):
 
     return data
 
-def random_qaoa_params(p):
-    random_gamma = [random.random()*2*math.pi for _ in range(p)]
-    random_beta = [random.random()*math.pi for _ in range(p)]
-    return random_gamma + random_beta
+def load_data_prototype(mode):
+    data = {
+        'node': 0,
+        'edges': [],
+        'n_edge': 0,
+        'shift': 0.0,
+        'true_obj': 0.0,
+        'obj': {},
+        'energies': {},
+        'obj_norm': {},
+        'alpha': {},
+        'params': {},
+    }
+
+    if mode == 'reg':
+        data['degree'] = 0
+    elif mode == 'gnp':
+        data['prob'] = 0.0
+
+    return data
