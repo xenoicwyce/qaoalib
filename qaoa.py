@@ -2,6 +2,7 @@ import numpy as np
 
 
 def random_qaoa_params(p):
+    """Generate random QAOA parameters."""
     gamma = np.random.rand(p,) * 2*np.pi
     beta = np.random.rand(p,) * np.pi
     return np.hstack((gamma, beta))

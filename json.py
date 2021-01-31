@@ -18,3 +18,6 @@ def to_serializable(o):
         return int(o)
     if isinstance(o, np.floating):
         return float(o)
+
+def cast_dict(d):
+    return {int(k): v for k, v in d.items()}

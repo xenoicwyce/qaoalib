@@ -94,7 +94,7 @@ def _gnp_params(node, prob, seed=None):
 
     _draw_network(mode='gnp', G=G, solution=solution)
 
-    return n_edge, shift, cost
+    return list(G.edges), shift, cost
 
 def _reg_params(degree, node, seed=None):
     if seed is None:
@@ -144,7 +144,7 @@ def extract_from_filename(filename, data):
 
     return data
 
-def load_data_prototype(mode):
+def load_data_prototype(mode, G=None):
     data = {
         'node': 0,
         'edges': [],
@@ -162,5 +162,14 @@ def load_data_prototype(mode):
         data['degree'] = 0
     elif mode == 'gnp':
         data['prob'] = 0.0
+
+    if G is not None:
+        data['node'] = len(G.nodes)
+        data['edges'] = list(G.edges)
+        data['n_edge'] = len(G.edges)
+        data['shift'] = -data['n_edge']/2.0
+
+        if mode == 'reg':
+            data['degree'] = len(list(G.neighbors(0)))
 
     return data
