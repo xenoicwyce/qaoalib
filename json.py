@@ -19,5 +19,5 @@ def to_serializable(o):
     if isinstance(o, np.floating):
         return float(o)
 
-def cast_dict(d):
-    return {int(k): v for k, v in d.items()}
+def cast_key(dict_, dtype=int):
+    return {dtype(k): v for k, v in dict_.items()}
