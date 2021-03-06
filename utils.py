@@ -90,7 +90,12 @@ def _gnp_params(node, prob, seed=None):
 
     n_edge = len(G.edges())
     shift = -n_edge/2
-    cost, solution = maxcut_brute(G)
+
+    if node > 16:
+        cost = None
+        solution = None
+    else:
+        cost, solution = maxcut_brute(G)
 
     _draw_network(mode='gnp', G=G, solution=solution)
 
@@ -105,7 +110,12 @@ def _reg_params(degree, node, seed=None):
 
     n_edge = len(G.edges())
     shift = -n_edge/2
-    cost, solution = maxcut_brute(G)
+
+    if node > 16:
+        cost = None
+        solution = None
+    else:
+        cost, solution = maxcut_brute(G)
 
     _draw_network(mode='reg', G=G, solution=solution)
 
