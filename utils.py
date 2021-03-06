@@ -183,3 +183,18 @@ def load_data_prototype(mode, G=None):
             data['degree'] = len(list(G.neighbors(0)))
 
     return data
+
+def info_reg3(G):
+    count_type1 = count_type2 = count_type3 = 0
+    for u, v in G.edges:
+        nu = set(G.neighbors(u))
+        nv = set(G.neighbors(v))
+        inter = len(nu & nv)
+        if inter == 2:
+            count_type1 += 1
+        elif inter == 1:
+            count_type2 += 1
+        elif inter == 0:
+            count_type3 += 1
+
+    return count_type1, count_type2, count_type3
