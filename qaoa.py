@@ -1,5 +1,4 @@
 import numpy as np
-import networkx as nx
 import matplotlib.pyplot as plt
 
 from matplotlib import cm
@@ -79,13 +78,6 @@ class QaoaMaxCut:
         self.exp_arr = None
         self.depth = 1 if prev_params is None else len(prev_params)//2+1
 
-    @classmethod
-    def set_timer(cls):
-        for attr in dir(cls):
-            if not attr.startswith('__'):
-                if callable(getattr(cls, attr)):
-                    setattr(cls, attr, func_timer(getattr(cls, attr)))
-
     def _mplus(self):
         ans = plus
         for q in range(1, self.num_qubits):
@@ -98,19 +90,6 @@ class QaoaMaxCut:
         for u, v in self.edge_list:
             ans += np.eye(N) - self.tensor(Z, [u, v])
         return ans/2
-
-    def cnot(self, ctrl, target):
-        if ctrl >= self.num_qubits:
-            raise ValueError('Control index out of range.')
-        if target >= self.num_qubits:
-            raise ValueError('Target index out of range.')
-
-        ans = np.eye(2**self.num_qubits)
-        for n in range(2**self.num_qubits):
-            if to_bin(n, self.num_qubits)[ctrl] == '1':
-                ans[n, n] = 0
-                ans[n, n^((2**self.num_qubits) >> (target+1))] = 1
-        return ans
 
     def tensor(self, u3, qubits):
         if 0 in qubits:
