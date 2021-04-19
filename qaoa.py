@@ -24,11 +24,25 @@ cnot = np.array([
 ])
 plus = np.ones((2, 1)) * 1/np.sqrt(2)
 
+def split_gb(params):
+    depth = len(params)//2
+    gamma = params[:depth]
+    beta = params[depth:]
+    return gamma, beta
+
 def random_qaoa_params(p):
     """Generate random QAOA parameters."""
     gamma = np.random.rand(p,) * 2*np.pi
     beta = np.random.rand(p,) * np.pi
     return np.hstack((gamma, beta))
+
+def interp(old_params, new_params):
+    gamma, beta = split_gb(old_params)
+    new_gamma, new_beta = split_gb(new_params)
+    if isinstance(gamma, np.ndarray):
+        return np.hstack((gamma, new_gamma, beta, new_beta))
+    else:
+        return gamma.append(new_gamma) + beta.append(new_beta)
 
 def interp_rand(params):
     """
@@ -40,7 +54,6 @@ def interp_rand(params):
     beta = params[depth:]
     gamma = np.hstack((gamma, np.random.rand()*2*np.pi))
     beta = np.hstack((beta, np.random.rand()*np.pi))
-
     return np.hstack((gamma, beta))
 
 def rx(theta):
@@ -169,13 +182,54 @@ class QaoaMaxCut:
             sum_ += (sv.conj().T @ fast_kron(kron_list, sv)).item().real
         return (len(self.edge_list) - sum_)/2
 
-    def create_grid(self, npts=100, gmin=0, gmax=2*np.pi, bmin=0, bmax=np.pi, fast=True):
+    def hadamard_test(self, params):
+        """
+        Return a list of QuantumCircuit's for hadamard tests.
+        """
+        qc_list = []
+        ansatz_circ = self.get_circuit(params)
+
+        for u, v in self.edge_list:
+            q = QuantumRegister(1, name='q')
+            ansatz = QuantumRegister(self.num_qubits, name='ansatz')
+            qc = QuantumCircuit(q, ansatz)
+
+            qc.h(q)
+            qc.append(ansatz_circ, ansatz)
+            qc.cz(q, ansatz[u])
+            qc.cz(q, ansatz[v])
+            qc.h(q)
+
+            qc_list.append(qc)
+
+        return qc_list
+
+    def ht_expectation(self, params):
+        backend = Aer.get_backend('statevector_simulator')
+        qc_list = self.hadamard_test(params)
+        exp_list = []
+
+        for qc in qc_list:
+            qc = qc.reverse_bits()
+            job = execute(qc, backend)
+            sv = job.result().get_statevector()
+            zero, one = np.split(sv, 2)
+            zero_prob = np.sum(np.abs(zero)**2)
+            one_prob = np.sum(np.abs(one)**2)
+            exp_list.append(zero_prob - one_prob)
+
+        return (len(self.edge_list) - sum(exp_list))/2
+
+    def create_grid(self, npts=100, gmin=0, gmax=2*np.pi, bmin=0, bmax=np.pi, mode='ht'):
         grange = np.linspace(gmin, gmax, npts)
         brange = np.linspace(bmin, bmax, npts)
         gmesh, bmesh = np.meshgrid(grange, brange)
         gg = gmesh.reshape((-1,))
         bb = bmesh.reshape((-1,))
-        if fast:
+        if mode == 'ht':
+            exp_arr = np.array(list(map(self.ht_expectation, make_params_vec(gg, bb, self.prev_params))))\
+                        .reshape((npts, npts))
+        elif mode == 'fast':
             exp_arr = np.array(list(map(self.fast_expectation, make_params_vec(gg, bb, self.prev_params))))\
                         .reshape((npts, npts))
         else:
