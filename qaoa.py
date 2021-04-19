@@ -74,8 +74,8 @@ class QaoaMaxCut:
         self.graph = G
         self.num_qubits = len(G.nodes)
         self.edge_list = list(G.edges)
-        # self.plusxn = self._mplus()
-        # self.hamiltonian = self._hmt()
+        self.plusxn = None
+        self.hamiltonian = None 
         self.prev_params = prev_params
         self.gmesh = None
         self.bmesh = None
@@ -123,6 +123,9 @@ class QaoaMaxCut:
         return ans
 
     def expectation(self, params):
+        if self.plusxn is None or self.hamiltonian is None:
+            self.plusxn = self._mplus()
+            self.hamiltonian = self._hmt()
         depth = len(params)//2
         gamma_vec = params[:depth]
         beta_vec = params[depth:]
@@ -176,8 +179,6 @@ class QaoaMaxCut:
             exp_arr = np.array(list(map(self.fast_expectation, make_params_vec(gg, bb, self.prev_params))))\
                         .reshape((npts, npts))
         else:
-            self.plusxn = self._mplus()
-            self.hamiltonian = self._hmt()
             exp_arr = np.array(list(map(self.expectation, make_params_vec(gg, bb, self.prev_params))))\
                         .reshape((npts, npts))
 
