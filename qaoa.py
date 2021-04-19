@@ -2,6 +2,10 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 from matplotlib import cm
+from qiskit import QuantumRegister, QuantumCircuit
+from qiskit import Aer, execute
+
+from .math import fast_kron
 
 I = np.eye(2)
 X = np.array([
@@ -70,8 +74,8 @@ class QaoaMaxCut:
         self.graph = G
         self.num_qubits = len(G.nodes)
         self.edge_list = list(G.edges)
-        self.plusxn = self._mplus()
-        self.hamiltonian = self._hmt()
+        # self.plusxn = self._mplus()
+        # self.hamiltonian = self._hmt()
         self.prev_params = prev_params
         self.gmesh = None
         self.bmesh = None
@@ -130,14 +134,52 @@ class QaoaMaxCut:
         else:
             return ans
 
-    def create_grid(self, npts=100, gmin=0, gmax=2*np.pi, bmin=0, bmax=np.pi):
+    def get_circuit(self, params):
+        depth = len(params)//2
+        gamma = params[:depth]
+        beta = params[depth:]
+
+        q = QuantumRegister(self.num_qubits, name='q')
+        qc = QuantumCircuit(q, name='qaoa_ansatz')
+
+        qc.h(q)
+        for p in range(depth):
+            for u, v in self.edge_list:
+                qc.cx(u, v)
+                qc.rz(gamma[p], v)
+                qc.cx(u, v)
+            qc.rx(2*beta[p], q)
+        return qc
+
+    def run_circuit(self, params):
+        qc = self.get_circuit(params)
+        backend = Aer.get_backend('statevector_simulator')
+        job = execute(qc, backend)
+        return job.result().get_statevector()
+
+    def fast_expectation(self, params):
+        sv = self.run_circuit(params)
+        sum_ = 0
+        for edge in self.edge_list:
+            kron_list = [Z if i in edge else I for i in range(self.num_qubits)]
+            kron_list.reverse()
+            sum_ += (sv.conj().T @ fast_kron(kron_list, sv)).item().real
+        return (len(self.edge_list) - sum_)/2
+
+    def create_grid(self, npts=100, gmin=0, gmax=2*np.pi, bmin=0, bmax=np.pi, fast=True):
         grange = np.linspace(gmin, gmax, npts)
         brange = np.linspace(bmin, bmax, npts)
         gmesh, bmesh = np.meshgrid(grange, brange)
         gg = gmesh.reshape((-1,))
         bb = bmesh.reshape((-1,))
-        exp_arr = np.array(list(map(self.expectation, make_params_vec(gg, bb, self.prev_params))))\
-                    .reshape((npts, npts))
+        if fast:
+            exp_arr = np.array(list(map(self.fast_expectation, make_params_vec(gg, bb, self.prev_params))))\
+                        .reshape((npts, npts))
+        else:
+            self.plusxn = self._mplus()
+            self.hamiltonian = self._hmt()
+            exp_arr = np.array(list(map(self.expectation, make_params_vec(gg, bb, self.prev_params))))\
+                        .reshape((npts, npts))
 
         self.gmesh = gmesh
         self.bmesh = bmesh
