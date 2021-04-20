@@ -39,10 +39,7 @@ def random_qaoa_params(p):
 def interp(old_params, new_params):
     gamma, beta = split_gb(old_params)
     new_gamma, new_beta = split_gb(new_params)
-    if isinstance(gamma, np.ndarray):
-        return np.hstack((gamma, new_gamma, beta, new_beta))
-    else:
-        return gamma.append(new_gamma) + beta.append(new_beta)
+    return np.hstack((gamma, new_gamma, beta, new_beta))
 
 def interp_rand(params):
     """
