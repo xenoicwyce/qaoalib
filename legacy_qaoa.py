@@ -7,6 +7,8 @@ from qiskit import Aer, execute
 
 from .math import fast_kron
 
+
+# globals
 I = np.eye(2)
 X = np.array([
     [0, 1],
@@ -24,6 +26,10 @@ cnot = np.array([
 ])
 plus = np.ones((2, 1)) * 1/np.sqrt(2)
 
+sv_backend = Aer.get_backend('statevector_simulator')
+
+
+# functions
 def split_gb(params):
     depth = len(params)//2
     gamma = params[:depth]
@@ -79,13 +85,30 @@ def make_params_vec(gamma1d, beta1d, prev_params=None):
 
     return zip(*gamma_list, gamma1d, *beta_list, beta1d)
 
+def qaoa_circuit(G, params):
+    depth = len(params)//2
+    gamma = params[:depth]
+    beta = params[depth:]
+
+    q = QuantumRegister(len(G.nodes))
+    qc = QuantumCircuit(q)
+
+    qc.h(q)
+    for p in range(depth):
+        for u, v in G.edges:
+            qc.cx(u, v)
+            qc.rz(gamma[p], v)
+            qc.cx(u, v)
+        qc.rx(2*beta[p], q)
+    return qc
+
+
+# classes
 class QaoaMaxCut:
     def __init__(self, G, prev_params=None):
         self.graph = G
         self.num_qubits = len(G.nodes)
         self.edge_list = list(G.edges)
-        self.plusxn = None
-        self.hamiltonian = None 
         self.prev_params = prev_params
         self.gmesh = None
         self.bmesh = None
@@ -152,8 +175,8 @@ class QaoaMaxCut:
         gamma = params[:depth]
         beta = params[depth:]
 
-        q = QuantumRegister(self.num_qubits, name='q')
-        qc = QuantumCircuit(q, name='qaoa_ansatz')
+        q = QuantumRegister(self.num_qubits)
+        qc = QuantumCircuit(q)
 
         qc.h(q)
         for p in range(depth):
@@ -166,9 +189,13 @@ class QaoaMaxCut:
 
     def run_circuit(self, params):
         qc = self.get_circuit(params)
-        backend = Aer.get_backend('statevector_simulator')
-        job = execute(qc, backend)
+        job = execute(qc, sv_backend)
         return job.result().get_statevector()
+
+    def run_circuit_list(self, qc_list):
+        job = execute(qc_list, sv_backend)
+        result = job.result()
+        return [result.get_statevector(idx) for idx in range(len(qc_list))]
 
     def fast_expectation(self, params):
         sv = self.run_circuit(params)
@@ -178,6 +205,24 @@ class QaoaMaxCut:
             kron_list.reverse()
             sum_ += (sv.conj().T @ fast_kron(kron_list, sv)).item().real
         return (len(self.edge_list) - sum_)/2
+    
+    def _fast_kron(self, sv):
+        sum_ = 0
+        for edge in self.edge_list:
+            kron_list = [Z if i in edge else I for i in range(self.num_qubits)]
+            kron_list.reverse()
+            sum_ += (sv.conj().T @ fast_kron(kron_list, sv)).item().real
+        return (len(self.edge_list) - sum_)/2
+
+    def new_fast_exp(self, grange, brange, npts, prev_params=None):
+        if prev_params is None:
+            qc_list = [self.get_circuit([gamma, beta]) for beta in brange for gamma in grange]
+        else:
+            qc_list = [self.get_circuit(interp(prev_params, [gamma, beta]))
+                        for beta in brange for gamma in grange]
+        ansatz_list = self.run_circuit_list(qc_list)
+        exp_arr = np.array(list(map(self._fast_kron, ansatz_list))).reshape((npts, npts))
+        return exp_arr
 
     def hadamard_test(self, params):
         """
@@ -202,13 +247,12 @@ class QaoaMaxCut:
         return qc_list
 
     def ht_expectation(self, params):
-        backend = Aer.get_backend('statevector_simulator')
         qc_list = self.hadamard_test(params)
         exp_list = []
 
         for qc in qc_list:
             qc = qc.reverse_bits()
-            job = execute(qc, backend)
+            job = execute(qc, sv_backend)
             sv = job.result().get_statevector()
             zero, one = np.split(sv, 2)
             zero_prob = np.sum(np.abs(zero)**2)
@@ -217,18 +261,20 @@ class QaoaMaxCut:
 
         return (len(self.edge_list) - sum(exp_list))/2
 
-    def create_grid(self, npts=100, gmin=0, gmax=2*np.pi, bmin=0, bmax=np.pi, mode='ht'):
+    def create_grid(self, npts=100, gmin=0, gmax=2*np.pi, bmin=0, bmax=np.pi, method='ht'):
         grange = np.linspace(gmin, gmax, npts)
         brange = np.linspace(bmin, bmax, npts)
         gmesh, bmesh = np.meshgrid(grange, brange)
         gg = gmesh.reshape((-1,))
         bb = bmesh.reshape((-1,))
-        if mode == 'ht':
+        if method == 'ht':
             exp_arr = np.array(list(map(self.ht_expectation, make_params_vec(gg, bb, self.prev_params))))\
                         .reshape((npts, npts))
-        elif mode == 'fast':
+        elif method == 'fast':
             exp_arr = np.array(list(map(self.fast_expectation, make_params_vec(gg, bb, self.prev_params))))\
                         .reshape((npts, npts))
+        elif method == 'new_fast':
+            exp_arr = self.new_fast_exp(grange, brange, npts, self.prev_params)
         else:
             exp_arr = np.array(list(map(self.expectation, make_params_vec(gg, bb, self.prev_params))))\
                         .reshape((npts, npts))
