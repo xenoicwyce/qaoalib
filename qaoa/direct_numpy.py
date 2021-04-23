@@ -7,9 +7,9 @@ from .utils import rx, make_params_vec
 
 class DirectNumpy(QmcBase):
     def __init__(self, G, prev_params=None):
+        super().__init__(G, prev_params)
         self.plusxn = self._mplus()
         self.hamiltonian = self._hmt()
-        super().__init__(G, prev_params)
         
     def _mplus(self):
         ans = plus
