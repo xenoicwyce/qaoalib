@@ -1,18 +1,18 @@
 import numpy as np
 
 from .base import QmcBase
-from .utils import I, Z
-from .utils import interp, qaoa_circuit, run_many_circuits
+from .utils import I, Z, interp
+from .qis import qaoa_circuit, run_many_circuits
 from ..math import fast_kron
 
 
 class HybridFast(QmcBase):
     def __init__(self, G, prev_params=None):
         super().__init__(G, prev_params)
-        
+
     def get_circuit(self, params):
-        return qaoa_circuit(self.graph, params)    
-        
+        return qaoa_circuit(self.graph, params)
+
     def _fast_kron_exp(self, sv):
         sum_ = 0
         for edge in self.edge_list:
@@ -31,7 +31,7 @@ class HybridFast(QmcBase):
         ansatz_list = run_many_circuits(qc_list)
         exp_arr = np.array(list(map(self._fast_kron_exp, ansatz_list))).reshape((npts, npts))
         return exp_arr
-    
+
     def create_grid(self, npts=100, gmin=0, gmax=2*np.pi, bmin=0, bmax=np.pi):
         grange = np.linspace(gmin, gmax, npts)
         brange = np.linspace(bmin, bmax, npts)
