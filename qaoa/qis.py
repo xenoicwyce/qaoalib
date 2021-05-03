@@ -39,6 +39,7 @@ def hadamard_test_circuits(G, params):
         qc.cz(q, ansatz[v])
         qc.h(q)
 
+        # bit reversal is required to calculate probabilities
         qc = qc.reverse_bits()
         qc_list.append(qc)
 
