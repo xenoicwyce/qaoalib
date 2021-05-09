@@ -1,12 +1,12 @@
 import numpy as np
 
-from .base import QmcBase
-from .utils import I, Z, interp
-from .qis import qaoa_circuit, run_many_circuits
-from ..math import fast_kron
+from .base import QmcLandscapeBase
+from ..utils import I, Z, interp
+from ..qis import qaoa_circuit, run_many_circuits
+from ...math import fast_kron
 
 
-class HybridFast(QmcBase):
+class HybridFast(QmcLandscapeBase):
     def __init__(self, G, prev_params=None):
         super().__init__(G, prev_params)
 

@@ -1,16 +1,16 @@
 import numpy as np
 
-from .base import QmcBase
-from .utils import I, Z, plus
-from .utils import rx, make_params_vec
+from .base import QmcLandscapeBase
+from ..utils import I, Z, plus
+from ..utils import rx, make_params_vec
 
 
-class DirectNumpy(QmcBase):
+class DirectNumpy(QmcLandscapeBase):
     def __init__(self, G, prev_params=None):
         super().__init__(G, prev_params)
         self.plusxn = self._mplus()
         self.hamiltonian = self._hmt()
-        
+
     def _mplus(self):
         ans = plus
         for q in range(1, self.num_qubits):
@@ -65,7 +65,7 @@ class DirectNumpy(QmcBase):
             return ans.real
         else:
             return ans
-        
+
     def create_grid(self, npts=100, gmin=0, gmax=2*np.pi, bmin=0, bmax=np.pi):
         grange = np.linspace(gmin, gmax, npts)
         brange = np.linspace(bmin, bmax, npts)

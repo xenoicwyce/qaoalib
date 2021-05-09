@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 from matplotlib import cm
 
 
-class QmcBase:
+class QmcLandscapeBase:
     """
     This is a base class.
     It should be only used for inhertiance.
@@ -18,7 +18,7 @@ class QmcBase:
         self.bmesh = None
         self.exp_arr = None
         self.depth = 1 if prev_params is None else len(prev_params)//2+1
-        
+
     def get_max(self):
         if self.exp_arr is None:
             raise ValueError('Grid not found. Run create_grid() method first.')

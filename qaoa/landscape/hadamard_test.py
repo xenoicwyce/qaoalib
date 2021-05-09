@@ -1,8 +1,8 @@
 import numpy as np
 
 from .base import QmcBase
-from .utils import interp, ht_expectation
-from .qis import hadamard_test_circuits, run_many_circuits
+from ..utils import interp, ht_expectation
+from ..qis import hadamard_test_circuits, run_many_circuits
 
 
 class HadamardTest(QmcBase):
