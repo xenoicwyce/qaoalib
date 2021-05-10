@@ -154,7 +154,7 @@ def extract_from_filename(filename, data):
 
     return data
 
-def load_data_prototype(mode, G=None):
+def load_data_prototype(mode, G=None, prob=0.0):
     data = {
         'node': 0,
         'edges': [],
@@ -174,13 +174,19 @@ def load_data_prototype(mode, G=None):
         data['prob'] = 0.0
 
     if G is not None:
+        # write all the relevant data if G is given
         data['node'] = len(G.nodes)
         data['edges'] = list(G.edges)
         data['n_edge'] = len(G.edges)
         data['shift'] = -data['n_edge']/2.0
+        data['true_obj'], _ = maxcut_brute(G)
 
         if mode == 'reg':
             data['degree'] = len(list(G.neighbors(0)))
+        elif mode == 'gnp':
+            if not prob:
+                raise ValueError('Please pass `prob` into the function when G is given.')
+            data['prob'] = prob
 
     return data
 
