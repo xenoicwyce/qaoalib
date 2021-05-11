@@ -1,8 +1,9 @@
 from qiskit import QuantumRegister, QuantumCircuit
-from qiskit import Aer, execute
+from qiskit import Aer, execute, transpile
 
 
 sv_backend = Aer.get_backend('statevector_simulator')
+aer_backend = Aer.get_backend('aer_simulator')
 
 def qaoa_circuit(G, params):
     depth = len(params)//2
