@@ -1,11 +1,11 @@
 import numpy as np
 
-from .base import QmcBase
+from .base import QmcLandscapeBase
 from ..utils import interp, ht_expectation
 from ..qis import hadamard_test_circuits, run_many_circuits
 
 
-class HadamardTest(QmcBase):
+class HadamardTest(QmcLandscapeBase):
     def __init__(self, G, prev_params=None):
         super().__init__(G, prev_params)
 
