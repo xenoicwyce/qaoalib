@@ -1,4 +1,5 @@
 import warnings
+import numpy as np
 import networkx as nx
 
 
@@ -204,3 +205,29 @@ def info_reg3(G):
             count_type3 += 1
 
     return count_type1, count_type2, count_type3
+
+def get_best_params(data, p_range):
+    """
+    Get the best params from data.
+    If p_range is an int, will return a list of the best params.
+    If p_range is an iterable, will return a dict of params with the
+    depths as the key.
+
+    """
+    energies = data['energies']
+    if type(p_range) is int:
+        p = p_range
+        idx = energies[str(p)].index(min(energies[str(p)]))
+        return data['params'][str(p)][idx]
+    else:
+        params = {}
+        for p in range(*p_range):
+            idx = energies[str(p)].index(min(energies[str(p)]))
+            params[p] = data['params'][str(p)][idx]
+        return params
+
+def write_alpha(data):
+    for p, d in data['energies'].items():
+        alpha = -(np.array(d) + data['shift'])/data['true_obj']
+        data['alpha'][p] = alpha.tolist()
+    return data

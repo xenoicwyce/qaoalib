@@ -50,26 +50,6 @@ def interp_rand(params):
     beta = np.hstack((beta, np.random.rand()*np.pi))
     return np.hstack((gamma, beta)).tolist()
 
-def get_best_params(data, p_range):
-    """
-    Get the best params from data.
-    If p_range is an int, will return a list of the best params.
-    If p_range is an iterable, will return a dict of params with the
-    depths as the key.
-
-    """
-    energies = data['energies']
-    if type(p_range) is int:
-        p = p_range
-        idx = energies[str(p)].index(min(energies[str(p)]))
-        return data['params'][str(p)][idx]
-    else:
-        params = {}
-        for p in range(*p_range):
-            idx = energies[str(p)].index(min(energies[str(p)]))
-            params[p] = data['params'][str(p)][idx]
-        return params
-
 def rx(theta):
     return np.array([
         [np.cos(theta/2), -1j*np.sin(theta/2)],
