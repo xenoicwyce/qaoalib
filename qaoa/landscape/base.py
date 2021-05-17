@@ -39,7 +39,7 @@ class QmcLandscapeBase:
         angle_list = [(self.gmesh[idx], self.bmesh[idx]) for idx in indices]
         return (exp_min, angle_list)
 
-    def show_landscape(self, plot_options={}):
+    def show_landscape(self, **plot_options):
         defaults = {
             'figsize': (16, 9),
         }
@@ -59,7 +59,7 @@ class QmcLandscapeBase:
 
         plt.show()
 
-    def show_heatmap(self, plot_options={}):
+    def show_heatmap(self):
         if self.exp_arr is None:
             raise ValueError('Grid not found. Run create_grid() method first.')
 
