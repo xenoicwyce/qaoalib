@@ -29,6 +29,16 @@ class QmcLandscapeBase:
         angle_list = [(self.gmesh[idx], self.bmesh[idx]) for idx in indices]
         return (exp_max, angle_list)
 
+    def get_min(self):
+        if self.exp_arr is None:
+            raise ValueError('Grid not found. Run create_grid() method first.')
+
+        exp_min = np.min(self.exp_arr)
+        whr = np.where(np.isclose(self.exp_arr, exp_min))
+        indices = zip(whr[0], whr[1])
+        angle_list = [(self.gmesh[idx], self.bmesh[idx]) for idx in indices]
+        return (exp_min, angle_list)
+
     def show_landscape(self, plot_options={}):
         defaults = {
             'figsize': (16, 9),
