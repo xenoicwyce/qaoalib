@@ -11,7 +11,7 @@ class Qmc:
         self.result = None
         self.expectation = None
 
-    def run(self, backend_name, execute_kw={}):
+    def run(self, backend_name, **execute_kw):
         qc = self.circuit
         if backend_name == 'qasm_simulator':
             qc.measure_all()
