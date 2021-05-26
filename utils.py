@@ -155,7 +155,7 @@ def extract_from_filename(filename, data):
 
     return data
 
-def load_data_prototype(graph_type, G=None, **nxgraph_kw):
+def load_data_prototype(graph_type, G=None, **data_kw):
     data = {
         'node': 0,
         'edges': [],
@@ -185,11 +185,10 @@ def load_data_prototype(graph_type, G=None, **nxgraph_kw):
         if graph_type == 'reg':
             data['degree'] = len(list(G.neighbors(0)))
         elif graph_type == 'gnp':
-            if not nxgraph_kw['prob']:
+            if not data_kw['prob']:
                 raise ValueError('Please pass `prob` into the function when G is given.')
 
-        data.update(nxgraph_kw)
-
+    data.update(data_kw)
     return data
 
 def info_reg3(G):
