@@ -155,7 +155,7 @@ def extract_from_filename(filename, data):
 
     return data
 
-def load_data_prototype(mode, G=None, prob=0.0):
+def load_data_prototype(graph_type, G=None, **nxgraph_kw):
     data = {
         'node': 0,
         'edges': [],
@@ -169,9 +169,9 @@ def load_data_prototype(mode, G=None, prob=0.0):
         'params': {},
     }
 
-    if mode == 'reg':
+    if graph_type == 'reg':
         data['degree'] = 0
-    elif mode == 'gnp':
+    elif graph_type == 'gnp':
         data['prob'] = 0.0
 
     if G is not None:
@@ -182,12 +182,13 @@ def load_data_prototype(mode, G=None, prob=0.0):
         data['shift'] = -data['n_edge']/2.0
         data['true_obj'], _ = maxcut_brute(G)
 
-        if mode == 'reg':
+        if graph_type == 'reg':
             data['degree'] = len(list(G.neighbors(0)))
-        elif mode == 'gnp':
-            if not prob:
+        elif graph_type == 'gnp':
+            if not nxgraph_kw['prob']:
                 raise ValueError('Please pass `prob` into the function when G is given.')
-            data['prob'] = prob
+
+        data.update(nxgraph_kw)
 
     return data
 
