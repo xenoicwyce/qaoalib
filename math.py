@@ -1,3 +1,8 @@
+"""
+Taken and modified from:
+https://gist.github.com/ahwillia/f65bc70cb30206d4eadec857b98c4065
+"""
+
 import numpy as np
 
 def _unfold(tens, mode, dims):
