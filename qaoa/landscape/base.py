@@ -10,6 +10,9 @@ class QmcLandscapeBase:
     It should be only used for inhertiance.
     """
     def __init__(self, G, prev_params=None):
+        if prev_params is not None:
+            if len(prev_params) % 2:
+                raise ValueError(f'Constructor failed. prev_params must have even length, got {len(prev_params)}.')
         self.graph = G
         self.num_qubits = len(G.nodes)
         self.edge_list = list(G.edges)
