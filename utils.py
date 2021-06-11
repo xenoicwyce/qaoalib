@@ -122,39 +122,6 @@ def _reg_params(degree, node, seed=None):
 
     return list(G.edges), shift, cost
 
-def extract_from_filename(filename, data):
-    """
-    Extracts primary data from file names and add their info to the
-    `data` dictionary.
-    """
-    mode = get_info(filename, '_', mode='get-alpha')
-    n = int(get_info(filename, 'n'))
-    seed = int(get_info(filename, 'seed'))
-    data['node'] = n
-    data['seed'] = seed
-
-    if mode == 'poly':
-        data['n_edge'] = n
-        data['shift'] = -n/2.0
-        data['true_obj'] = float(n) if n % 2 == 0 else float(n-1)
-        print('Polygon instance: node={}'.format(n))
-        _draw_network(mode=mode, n=n)
-    elif mode == 'gnp':
-        pr = get_info(filename, 'gnp')
-        data['prob'] = float(pr)/(10.0**(len(pr)-1))
-        data['edges'], data['shift'], data['true_obj'] = _gnp_params(data['node'], data['prob'], data['seed'])
-        data['n_edge'] = len(data['edges'])
-    elif mode == 'reg':
-        data['degree'] = int(get_info(filename, 'reg'))
-        data['edges'], data['shift'], data['true_obj'] = _reg_params(data['degree'], data['node'], data['seed'])
-        data['n_edge'] = len(data['edges'])
-    else:
-        # custom graph
-        data['shift'] = -data['n_edge']/2.0
-        print('Custom graph instance, please set n_edge and true_obj manually before running this script.')
-
-    return data
-
 def load_data_prototype(graph_type, G=None, **data_kw):
     data = {
         'node': 0,
@@ -190,6 +157,62 @@ def load_data_prototype(graph_type, G=None, **data_kw):
 
     data.update(data_kw)
     return data
+
+def extract_from_filename(filename, data):
+    """
+    Extracts primary data from file names and add their info to the
+    `data` dictionary.
+    """
+    mode = get_info(filename, '_', mode='get-alpha')
+    n = int(get_info(filename, 'n'))
+    seed = int(get_info(filename, 'seed'))
+    data['node'] = n
+    data['seed'] = seed
+
+    if mode == 'poly':
+        data['n_edge'] = n
+        data['shift'] = -n/2.0
+        data['true_obj'] = float(n) if n % 2 == 0 else float(n-1)
+        print('Polygon instance: node={}'.format(n))
+        _draw_network(mode=mode, n=n)
+    elif mode == 'gnp':
+        pr = get_info(filename, 'gnp')
+        data['prob'] = float(pr)/(10.0**(len(pr)-1))
+        data['edges'], data['shift'], data['true_obj'] = _gnp_params(data['node'], data['prob'], data['seed'])
+        data['n_edge'] = len(data['edges'])
+    elif mode == 'reg':
+        data['degree'] = int(get_info(filename, 'reg'))
+        data['edges'], data['shift'], data['true_obj'] = _reg_params(data['degree'], data['node'], data['seed'])
+        data['n_edge'] = len(data['edges'])
+    else:
+        # custom graph
+        data['shift'] = -data['n_edge']/2.0
+        print('Custom graph instance, please set n_edge and true_obj manually before running this script.')
+
+    return data
+
+def graph_from_name(filename):
+    """
+    Return networkx Graph object given the filename.
+
+    """
+    graph_type = get_info(filename, '_', mode='get-alpha')
+    node = int(get_info(filename, 'n'))
+    seed = int(get_info(filename, 'seed'))
+    if seed is None:
+        seed = 123
+
+    if graph_type == 'reg':
+        deg = int(get_info(filename, 'reg'))
+        G = nx.random_regular_graph(deg, node, seed=seed)
+    elif graph_type == 'gnp':
+        pr = get_info(filename, 'gnp')
+        prob = float(pr)/(10.0**(len(pr)-1))
+        G = nx.fast_gnp_random_graph(node, prob, seed=seed)
+    else:
+        raise ValueError(f'Unrecognized graph type {graph_type}.')
+
+    return G
 
 def info_reg3(G):
     count_type1 = count_type2 = count_type3 = 0
