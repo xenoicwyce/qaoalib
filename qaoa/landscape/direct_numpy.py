@@ -76,6 +76,7 @@ class DirectNumpy(QmcLandscapeBase):
         exp_arr = np.array(list(map(self.expectation, make_params_vec(gg, bb, self.prev_params))))\
                         .reshape((npts, npts))
 
+        self.npts = npts
         self.gmesh = gmesh
         self.bmesh = bmesh
         self.exp_arr = exp_arr

@@ -39,6 +39,7 @@ class HybridFast(QmcLandscapeBase):
 
         exp_arr = self.expectation_grid(grange, brange, npts, self.prev_params)
 
+        self.npts = npts
         self.gmesh = gmesh
         self.bmesh = bmesh
         self.exp_arr = exp_arr

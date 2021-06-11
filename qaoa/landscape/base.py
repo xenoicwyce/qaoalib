@@ -23,6 +23,7 @@ class QmcLandscapeBase:
         self.bmesh = None
         self.exp_arr = None
         self.depth = 1 if prev_params is None else len(prev_params)//2+1
+        self.npts = None
 
     def get_max(self, rtol=DEFAULT_RTOL, atol=DEFAULT_ATOL):
         if self.exp_arr is None:
