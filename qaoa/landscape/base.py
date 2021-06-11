@@ -3,6 +3,8 @@ import matplotlib.pyplot as plt
 
 from matplotlib import cm
 
+DEFAULT_RTOL = 1e-5
+DEFAULT_ATOL = 1e-8
 
 class QmcLandscapeBase:
     """
@@ -22,22 +24,22 @@ class QmcLandscapeBase:
         self.exp_arr = None
         self.depth = 1 if prev_params is None else len(prev_params)//2+1
 
-    def get_max(self):
+    def get_max(self, rtol=DEFAULT_RTOL, atol=DEFAULT_ATOL):
         if self.exp_arr is None:
             raise ValueError('Grid not found. Run create_grid() method first.')
 
         exp_max = np.max(self.exp_arr)
-        whr = np.where(np.isclose(self.exp_arr, exp_max))
+        whr = np.where(np.isclose(self.exp_arr, exp_max, rtol=rtol, atol=atol))
         indices = zip(whr[0], whr[1])
         angle_list = [(self.gmesh[idx], self.bmesh[idx]) for idx in indices]
         return (exp_max, angle_list)
 
-    def get_min(self):
+    def get_min(self, rtol=DEFAULT_RTOL, atol=DEFAULT_ATOL):
         if self.exp_arr is None:
             raise ValueError('Grid not found. Run create_grid() method first.')
 
         exp_min = np.min(self.exp_arr)
-        whr = np.where(np.isclose(self.exp_arr, exp_min))
+        whr = np.where(np.isclose(self.exp_arr, exp_min, rtol=rtol, atol=atol))
         indices = zip(whr[0], whr[1])
         angle_list = [(self.gmesh[idx], self.bmesh[idx]) for idx in indices]
         return (exp_min, angle_list)
