@@ -7,7 +7,7 @@ from matplotlib import cm
 from ..utils import I, Z
 from ..utils import rx
 
-class ParametersFixing:
+class Layerwise:
     def __init__(self, G):
         self.graph = G
         self.num_qubits = len(G.nodes)
