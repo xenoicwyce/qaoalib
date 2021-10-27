@@ -97,7 +97,7 @@ def _sv2dict(sv):
     num_qubits = int(num_qubits)
 
     sv_dict = {
-        f'idx:0{num_qubits}b': sv[idx]
+        f'{idx:0{num_qubits}b}': sv[idx]
         for idx in range(2**num_qubits)
     }
     return sv_dict
