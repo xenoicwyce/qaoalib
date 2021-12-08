@@ -1,11 +1,11 @@
 import pickle
 import numpy as np
-import matplotlib.pylot as plt
+import matplotlib.pyplot as plt
 
 from matplotlib import cm
 
-from ..utils import I, Z
-from ..utils import rx
+from .utils import I, Z
+from .utils import rx
 
 class Layerwise:
     def __init__(self, G):
