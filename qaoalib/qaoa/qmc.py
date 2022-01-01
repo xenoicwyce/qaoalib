@@ -1,7 +1,8 @@
 from qiskit import Aer, execute
 
-from .qis import qaoa_circuit
-from .utils import expectation
+from .qis import qaoa_circuit, sv_backend
+from .utils import expectation, I, Z
+from ..math import fast_kron
 
 class Qmc:
     def __init__(self, G, params):
@@ -25,3 +26,21 @@ class Qmc:
             self.result = result.get_statevector()
 
         self.expectation = expectation(self.graph, self.result)
+
+class QmcFastKron(Qmc):
+    def __init__(self, G, params):
+        super().__init__(G, params)
+
+    def _fast_kron_exp(self, sv):
+        sum_ = 0
+        for edge in self.graph.edges:
+            kron_list = [Z if i in edge else I for i in range(len(self.graph.nodes))]
+            kron_list.reverse()
+            sum_ += (sv.conj().T @ fast_kron(kron_list, sv)).item().real
+        # return a single expectation value
+        return (len(self.graph.edges) - sum_)/2
+
+    def run(self, **execute_kw):
+        job = execute(self.circuit, sv_backend, **execute_kw) # currently only support sv type
+        self.result = job.result().get_statevector()
+        self.expectation = self._fast_kron_exp(self.result)
