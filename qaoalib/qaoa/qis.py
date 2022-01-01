@@ -1,11 +1,16 @@
 from qiskit import QuantumRegister, QuantumCircuit
-from qiskit import Aer, execute, transpile
+from qiskit import Aer, execute
 
 
 sv_backend = Aer.get_backend('statevector_simulator')
 aer_backend = Aer.get_backend('aer_simulator')
 
 def qaoa_circuit(G, params):
+    """
+    QAOA circuit for Max-cut \sum(I-ZZ). No longer follow qiskit QAOA circuit.
+    If want to reproduce the circuit used in qiskit \sum(-ZZ), substitute
+    gamma as -gamma will do.
+    """
     depth = len(params)//2
     gamma = params[:depth]
     beta = params[depth:]
@@ -17,7 +22,7 @@ def qaoa_circuit(G, params):
     for p in range(depth):
         for u, v in G.edges:
             qc.cx(u, v)
-            qc.rz(gamma[p], v)
+            qc.rz(-gamma[p], v)
             qc.cx(u, v)
         qc.rx(2*beta[p], q)
     return qc
