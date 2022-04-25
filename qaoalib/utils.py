@@ -131,6 +131,7 @@ def load_data_prototype(graph_type, G=None, **data_kw):
         'true_obj': 0.0,
         'obj': {},
         'energies': {},
+        'expectations': {},
         'obj_norm': {},
         'alpha': {},
         'params': {},
@@ -249,8 +250,13 @@ def get_best_params(data, p_range):
             params[p] = data['params'][str(p)][idx]
         return params
 
-def write_alpha(data):
-    for p, d in data['energies'].items():
-        alpha = -(np.array(d) + data['shift'])/data['true_obj']
-        data['alpha'][p] = alpha.tolist()
-    return data
+def post_process(data):
+    if data.get('energies'):
+        for p, arr in data['energies'].items():
+            expectations = -(np.asarray(arr) + data['shift'])
+            data['expectations'][p] = expectations
+            data['alpha'][p] = expectations / data['true_obj']
+    else:
+        for p, arr in data['expectations'].items():
+            data['energies'][p] = -(np.asarray(arr) + data['shift'])
+            data['alpha'][p] = np.asarray(arr) / data['true_obj']
