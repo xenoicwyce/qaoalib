@@ -26,28 +26,42 @@ def split_gb(params):
     beta = params[depth:]
     return gamma, beta
 
-def random_qaoa_params(p):
+def random_qaoa_params(p, grange=None, brange=None):
     """Generate random QAOA parameters."""
-    gamma = np.random.rand(p,) * 2*np.pi
-    beta = np.random.rand(p,) * np.pi
-    return np.hstack((gamma, beta)).tolist()
+    if grange is None:
+        grange = (0, 2*np.pi)
+    if brange is None:
+        brange = (0, np.pi)
+
+    rng = np.random.default_rng()
+    # rng.uniform(low=0., high=1., size=None)
+    grand = rng.uniform(grange[0], grange[1], p)
+    brand = rng.uniform(brange[0], brange[1], p)
+    return np.hstack([grand, brand])
 
 def interp(old_params, new_params):
     gamma, beta = split_gb(old_params)
     new_gamma, new_beta = split_gb(new_params)
     return np.hstack((gamma, new_gamma, beta, new_beta)).tolist()
 
-def interp_rand(params):
+def interp_rand(params, grange=None, brange=None):
     """
     Adds a new random angle to the params array, and return
     the params required by (p+1).
     """
+    if grange is None:
+        grange = (0, 2*np.pi)
+    if brange is None:
+        brange = (0, np.pi)
+
     depth = len(params)//2
     gamma = params[:depth]
     beta = params[depth:]
-    gamma = np.hstack((gamma, np.random.rand()*2*np.pi))
-    beta = np.hstack((beta, np.random.rand()*np.pi))
-    return np.hstack((gamma, beta)).tolist()
+
+    rng = np.random.default_rng()
+    grand = rng.uniform(grange[0], grange[1], 1)
+    brand = rng.uniform(brange[0], brange[1], 1)
+    return np.hstack([gamma, grand, beta, brand])
 
 def rx(theta):
     return np.array([
