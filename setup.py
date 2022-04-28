@@ -20,7 +20,7 @@ setup(
     packages=find_packages(exclude=["test*"]),
     python_requires=">=3.6",
     install_requires=[
-        "numpy",
+        "numpy>=1.17",
         "matplotlib",
         "networkx",
         "qiskit>=0.25.0",
