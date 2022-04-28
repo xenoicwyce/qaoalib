@@ -3,9 +3,11 @@ from setuptools import setup, find_packages
 with open("README.md", "r", encoding="utf-8") as fh:
     long_description = fh.read()
 
+exec(open('qaoalib/version.py').read()) # puts __version__ into the namespace
+
 setup(
     name="qaoalib",
-    version="0.1.2",
+    version=__version__,
     author="Xinwei Lee",
     author_email="xenoicwyce@gmail.com",
     description="A package for QAOA Maxcut calculations",
