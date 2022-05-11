@@ -22,24 +22,23 @@ class HybridFast(QmcLandscapeBase):
         # return a single expectation value
         return (len(self.edge_list) - sum_)/2
 
-    def expectation_grid(self, grange, brange, npts, prev_params=None):
+    def expectation_grid(self, gspace, bspace, npts, prev_params=None):
         if prev_params is None:
-            qc_list = [self.get_circuit([gamma, beta]) for beta in brange for gamma in grange]
+            qc_list = [self.get_circuit([gamma, beta]) for beta in bspace for gamma in gspace]
         else:
             qc_list = [self.get_circuit(interp(prev_params, [gamma, beta]))
-                        for beta in brange for gamma in grange]
+                        for beta in bspace for gamma in gspace]
         ansatz_list = run_many_circuits(qc_list)
         exp_arr = np.array(list(map(self._fast_kron_exp, ansatz_list))).reshape((npts, npts))
         return exp_arr
 
     def create_grid(self, npts=100, gmin=0, gmax=2*np.pi, bmin=0, bmax=np.pi):
-        grange = np.linspace(gmin, gmax, npts)
-        brange = np.linspace(bmin, bmax, npts)
-        gmesh, bmesh = np.meshgrid(grange, brange)
-
-        exp_arr = self.expectation_grid(grange, brange, npts, self.prev_params)
-
+        self.grange = (gmin, gmax)
+        self.brange = (bmin, bmax)
         self.npts = npts
-        self.gmesh = gmesh
-        self.bmesh = bmesh
+        gmesh, bmesh = self._meshgrid()
+
+        gspace = np.linspace(gmin, gmax, npts)
+        bspace = np.linspace(bmin, bmax, npts)
+        exp_arr = self.expectation_grid(gspace, bspace, npts, self.prev_params)
         self.exp_arr = exp_arr

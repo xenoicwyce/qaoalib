@@ -67,16 +67,13 @@ class DirectNumpy(QmcLandscapeBase):
             return ans
 
     def create_grid(self, npts=100, gmin=0, gmax=2*np.pi, bmin=0, bmax=np.pi):
-        grange = np.linspace(gmin, gmax, npts)
-        brange = np.linspace(bmin, bmax, npts)
-        gmesh, bmesh = np.meshgrid(grange, brange)
+        self.grange = (gmin, gmax)
+        self.brange = (bmin, bmax)
+        self.npts = npts
+        gmesh, bmesh = self._meshgrid()
         gg = gmesh.reshape((-1,))
         bb = bmesh.reshape((-1,))
 
         exp_arr = np.array(list(map(self.expectation, make_params_vec(gg, bb, self.prev_params))))\
                         .reshape((npts, npts))
-
-        self.npts = npts
-        self.gmesh = gmesh
-        self.bmesh = bmesh
         self.exp_arr = exp_arr

@@ -12,10 +12,10 @@ class HadamardTest(QmcLandscapeBase):
     def get_circuits(self, params):
         return hadamard_test_circuits(self.graph, params)
 
-    def expectation_grid(self, grange, brange, npts, prev_params=None):
+    def expectation_grid(self, gspace, bspace, npts, prev_params=None):
         qc_list = []
-        for beta in brange:
-            for gamma in grange:
+        for beta in bspace:
+            for gamma in gspace:
                 if prev_params is None:
                     qc_list += self.get_circuits([gamma, beta])
                 else:
@@ -28,13 +28,12 @@ class HadamardTest(QmcLandscapeBase):
         return exp_arr
 
     def create_grid(self, npts=100, gmin=0, gmax=2*np.pi, bmin=0, bmax=np.pi):
-        grange = np.linspace(gmin, gmax, npts)
-        brange = np.linspace(bmin, bmax, npts)
-        gmesh, bmesh = np.meshgrid(grange, brange)
-
-        exp_arr = self.expectation_grid(grange, brange, npts, self.prev_params)
-
+        self.grange = (gmin, gmax)
+        self.brange = (bmin, bmax)
         self.npts = npts
-        self.gmesh = gmesh
-        self.bmesh = bmesh
+        gmesh, bmesh = self._meshgrid()
+
+        gspace = np.linspace(gmin, gmax, npts)
+        bspace = np.linspace(bmin, bmax, npts)
+        exp_arr = self.expectation_grid(gspace, bspace, npts, self.prev_params)
         self.exp_arr = exp_arr
