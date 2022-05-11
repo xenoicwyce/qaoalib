@@ -1,3 +1,4 @@
+import numpy as np
 from qiskit import Aer, execute
 
 from .qis import qaoa_circuit, sv_backend
@@ -23,7 +24,7 @@ class Qmc:
         if backend_name == 'qasm_simulator':
             self.result = result.get_counts()
         elif backend_name == 'statevector_simulator':
-            self.result = result.get_statevector()
+            self.result = np.asarray(result.get_statevector())
 
         self.expectation = expectation(self.graph, self.result)
 

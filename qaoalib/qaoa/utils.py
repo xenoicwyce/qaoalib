@@ -129,3 +129,6 @@ def expectation(G, counts_or_sv):
         for eigs, count in sv.items():
             sum_ += _cut_value(G, eigs) * (np.abs(sv[eigs])**2)
         return sum_
+
+    else:
+        raise TypeError(f'Unrecognized type {type(counts_or_sv)}.')
