@@ -73,10 +73,18 @@ class QmcLandscapeBase:
 
         plt.show()
 
-    def show_heatmap(self):
+    def show_heatmap(self, legacy=False):
         if self.exp_arr is None:
             raise ValueError('Grid not found. Run create_grid() method first.')
 
-        plt.xlabel('gamma_p/2pi')
-        plt.ylabel('beta_p/pi')
-        plt.imshow(self.exp_arr, cmap='coolwarm', origin='lower', extent=[0, 1, 0, 1])
+        if legacy:
+            plt.xlabel('norm(gamma_p)')
+            plt.ylabel('norm(beta_p)')
+            plt.imshow(self.exp_arr, cmap='coolwarm', origin='lower', extent=[0, 1, 0, 1])
+        else:
+            fig, ax = plt.subplots()
+            gmesh, bmesh = self._meshgrid()
+            ax.pcolormesh(gmesh, bmesh, self.exp_arr, cmap='coolwarm')
+            ax.set_xlabel('gamma')
+            ax.set_ylabel('beta')
+            plt.show()
