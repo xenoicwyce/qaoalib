@@ -98,9 +98,13 @@ def ht_expectation(sv):
 def _cut_value(G, eigenstate):
     eigenstate = eigenstate[::-1]
     cut = 0
-    for u, v in G.edges:
+    for u, v, d in G.edges(data=True):
         if eigenstate[u] != eigenstate[v]:
-            cut += 1
+            if 'weight' in d.keys():
+                w = d['weight']
+            else:
+                w = 1
+            cut += w
     return cut
 
 def _sv2dict(sv):
