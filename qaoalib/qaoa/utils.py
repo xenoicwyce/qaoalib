@@ -100,10 +100,7 @@ def _cut_value(G, eigenstate):
     cut = 0
     for u, v, d in G.edges(data=True):
         if eigenstate[u] != eigenstate[v]:
-            if 'weight' in d.keys():
-                w = d['weight']
-            else:
-                w = 1
+            w = d.get('weight', 1)
             cut += w
     return cut
 
