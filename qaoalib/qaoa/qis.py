@@ -21,9 +21,9 @@ def qaoa_circuit(G, params):
     qc.h(q)
     for p in range(depth):
         for u, v, d in G.edges(data=True):
-            w = d.get('weight', 1)
+            weight = d.get('weight', 1)
             qc.cx(u, v)
-            qc.rz(-gamma[p]*w, v)
+            qc.rz(-gamma[p]*weight, v)
             qc.cx(u, v)
         qc.rx(2*beta[p], q)
     return qc

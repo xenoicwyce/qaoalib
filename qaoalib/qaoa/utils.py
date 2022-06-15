@@ -100,8 +100,8 @@ def _cut_value(G, eigenstate):
     cut = 0
     for u, v, d in G.edges(data=True):
         if eigenstate[u] != eigenstate[v]:
-            w = d.get('weight', 1)
-            cut += w
+            weight = d.get('weight', 1)
+            cut += weight
     return cut
 
 def _sv2dict(sv):
