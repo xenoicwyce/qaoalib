@@ -34,10 +34,18 @@ class QmcFastKron(Qmc):
 
     def _fast_kron_exp(self, sv):
         sum_ = 0
-        for edge in self.graph.edges:
+        for u, v, d in self.graph.edges(data=True):
+            edge = (u,v)
             kron_list = [Z if i in edge else I for i in range(len(self.graph.nodes))]
             kron_list.reverse()
-            sum_ += (sv.conj().T @ fast_kron(kron_list, sv)).item().real
+            sum_ += d * (sv.conj().T @ fast_kron(kron_list, sv)).item().real
+            
+
+        # for edge in self.graph.edges:
+        #     kron_list = [Z if i in edge else I for i in range(len(self.graph.nodes))]
+        #     kron_list.reverse()
+        #     sum_ += (sv.conj().T @ fast_kron(kron_list, sv)).item().real
+
         # return a single expectation value
         return (len(self.graph.edges) - sum_)/2
 
