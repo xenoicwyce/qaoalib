@@ -38,14 +38,8 @@ class QmcFastKron(Qmc):
             edge = (u,v)
             kron_list = [Z if i in edge else I for i in range(len(self.graph.nodes))]
             kron_list.reverse()
-            sum_ += d.get("weight",1) * (1 - (sv.conj().T @ fast_kron(kron_list, sv)).item().real)
-            
- 
-        # for edge in self.graph.edges:
-        #     kron_list = [Z if i in edge else I for i in range(len(self.graph.nodes))]
-        #     kron_list.reverse()
-        #     sum_ += (sv.conj().T @ fast_kron(kron_list, sv)).item().real
-
+            weight = d.get('weight', 1)
+            sum_ += weight * (1 - (sv.conj().T @ fast_kron(kron_list, sv)).item().real)
         # return a single expectation value
         return sum_/2
 
