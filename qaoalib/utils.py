@@ -122,7 +122,7 @@ def _reg_params(degree, node, seed=None):
 
     return list(G.edges), shift, cost
 
-def load_data_prototype(graph_type, G=None, **data_kw):
+def load_data_prototype(graph_type, G=None, solve_brute=True, **data_kw):
     data = {
         'node': 0,
         'edges': [],
@@ -148,7 +148,8 @@ def load_data_prototype(graph_type, G=None, **data_kw):
         data['edges'] = list(G.edges)
         data['n_edge'] = len(G.edges)
         data['shift'] = -data['n_edge']/2.0
-        data['true_obj'], _ = maxcut_brute(G)
+        if solve_brute:
+            data['true_obj'], _ = maxcut_brute(G)
 
         if graph_type == 'reg':
             data['degree'] = len(list(G.neighbors(0)))
