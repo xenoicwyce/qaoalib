@@ -2,7 +2,7 @@ from typing import Union, Any
 from typing_extensions import TypeAlias
 from pydantic import BaseModel
 
-from graph import RegGraphData, GnpGraphData
+from .graph import RegGraphData, GnpGraphData
 
 SingleTrialDict: TypeAlias = dict[int, Any]
 MultipleTrialDict: TypeAlias = dict[int, list[Any]]

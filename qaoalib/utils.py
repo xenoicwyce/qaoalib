@@ -3,7 +3,7 @@ import warnings
 import numpy as np
 import networkx as nx
 
-from data.graph import RegGraphData, GnpGraphData
+from .data.graph import RegGraphData, GnpGraphData
 
 
 def get_info(filename, indicator, mode='get-numeric'):
