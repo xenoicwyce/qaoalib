@@ -5,6 +5,7 @@ from .qis import qaoa_circuit, sv_backend
 from .utils import expectation, I, Z
 from ..math import fast_kron
 
+
 class Qmc:
     def __init__(self, G, params):
         self.graph = G
@@ -27,6 +28,7 @@ class Qmc:
             self.result = np.asarray(result.get_statevector())
 
         self.expectation = expectation(self.graph, self.result)
+
 
 class QmcFastKron(Qmc):
     def __init__(self, G, params):
