@@ -26,5 +26,6 @@ setup(
         "matplotlib",
         "networkx",
         "qiskit>=0.25.0",
+        "pydantic",
     ]
 )
