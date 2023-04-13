@@ -20,7 +20,7 @@ setup(
         "Operating System :: OS Independent",
     ],
     packages=find_packages(exclude=["test*"]),
-    python_requires=">=3.6",
+    python_requires=">=3.9",
     install_requires=[
         "numpy>=1.17",
         "matplotlib",
