@@ -1,26 +1,49 @@
+import numpy as np
+
 from typing import Union, Any
 from typing_extensions import TypeAlias
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
+from pathlib import Path
+from collections import defaultdict
 
-from .graph import RegGraphData, GnpGraphData
+from qaoalib.utils import maxcut_brute, graph_from_name
 
-SingleTrialDict: TypeAlias = dict[int, Any]
-MultipleTrialDict: TypeAlias = dict[int, list[Any]]
-
-
-class Result(BaseModel):
-    graph: Union[RegGraphData, GnpGraphData]
-    expectations: SingleTrialDict
-    alpha: SingleTrialDict
-    initial_params: SingleTrialDict
-    opt_params: SingleTrialDict
-    nfev: SingleTrialDict
+ddl_wrapper = lambda : defaultdict(list)
 
 
-class PfResult(BaseModel):
-    graph: Union[RegGraphData, GnpGraphData]
-    expectations: MultipleTrialDict
-    alpha: MultipleTrialDict
-    initial_params: MultipleTrialDict
-    opt_params: MultipleTrialDict
-    nfev: MultipleTrialDict
+class BaseResult(BaseModel):
+    name: str
+    true_obj: int = 0
+
+    def solve_brute(self) -> None:
+        G = graph_from_name(self.name)
+        self.true_obj, _ = maxcut_brute(G)
+
+    def dump(self, target_dir='.') -> None:
+        target_dir = Path(target_dir)
+        with open(target_dir/f'{self.name}.json', 'w') as f:
+            json.dump(self.dict(), f)
+
+
+class SingleTrialResult(Result):
+    expectations: dict[int, float] = Field(default_factory=ddl_wrapper)
+    nfevs: dict[int, int] = Field(default_factory=ddl_wrapper)
+    initial_params: dict[int, list[float]] = Field(default_factory=ddl_wrapper)
+    opt_params: dict[int, list[float]] = Field(default_factory=ddl_wrapper)
+    alphas: dict[int, float] = Field(default_factory=ddl_wrapper)
+
+    def compute_alpha(self) -> None:
+        for p, exp in self.expectations.items():
+            self.alphas[p] = exp / self.true_obj
+
+
+class MultipleTrialResult(Result):
+    expectations: dict[int, list[float]] = Field(default_factory=ddl_wrapper)
+    nfevs: dict[int, list[int]] = Field(default_factory=ddl_wrapper)
+    initial_params: dict[int, list[list[float]]] = Field(default_factory=ddl_wrapper)
+    opt_params: dict[int, list[list[float]]] = Field(default_factory=ddl_wrapper)
+    alphas: dict[int, list[float]] = Field(default_factory=ddl_wrapper)
+    
+    def compute_alpha(self) -> None:
+        for p, exps in self.expectations.items():
+            self.alphas[p] = (np.asarray(exps) / self.true_obj).tolist()
