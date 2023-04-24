@@ -47,3 +47,17 @@ class MultipleTrialResult(Result):
     def compute_alpha(self) -> None:
         for p, exps in self.expectations.items():
             self.alphas[p] = (np.asarray(exps) / self.true_obj).tolist()
+
+
+class ItlwResult(BaseModel):
+    name: str
+    true_obj: int = 0
+    expectations: dict[int, list[float]] = Field(default_factory=dd_wrapper)
+    nfevs: dict[int, list[int]] = Field(default_factory=dd_wrapper)
+    initial_params: dict[int, list[list[float]]] = Field(default_factory=dd_wrapper)
+    opt_params: dict[int, list[list[float]]] = Field(default_factory=dd_wrapper)
+    alphas: dict[int, list[float]] = Field(default_factory=dd_wrapper)
+        
+    def compute_alpha(self):
+        for p, exps in self.expectations.items():
+            self.alphas[p] = (np.asarray(exps) / self.true_obj).tolist()
