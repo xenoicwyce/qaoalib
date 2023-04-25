@@ -55,6 +55,6 @@ class ItlwResult(BaseResult):
     opt_params: dict[int, list[list[float]]] = Field(default_factory=ddl_wrapper)
     alphas: dict[int, list[float]] = Field(default_factory=ddl_wrapper)
 
-    def compute_alpha(self):
+    def compute_alpha(self) -> None:
         for p, exps in self.expectations.items():
             self.alphas[p] = (np.asarray(exps) / self.true_obj).tolist()
