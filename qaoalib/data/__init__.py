@@ -1,4 +1,4 @@
-from .data import (
+from .result import (
     SingleTrialResult,
     MultipleTrialResult,
     ItlwResult,
