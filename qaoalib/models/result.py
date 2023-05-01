@@ -23,6 +23,12 @@ class BaseResult(BaseModel):
         with open(target_dir/f'{self.name}.json', 'w') as f:
             json.dump(self.dict(), f)
 
+    def init_defaultdict(self) -> None:
+        """ Initialize defaultdict for the attributes when loaded from file. """
+        for attr in ['expectations', 'nfevs', 'initial_params', 'opt_params', 'alphas']:
+            dd = defaultdict(list, getattr(self, attr))
+            setattr(self, attr, dd)
+
 
 class SingleTrialResult(BaseResult):
     expectations: dict[int, float] = Field(default_factory=ddl_wrapper)
