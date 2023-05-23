@@ -23,23 +23,21 @@ class BaseResult(BaseModel):
         with open(target_dir/f'{self.name}.json', 'w') as f:
             json.dump(self.dict(), f)
 
-    def init_defaultdict(self) -> None:
-        """ Initialize defaultdict for the attributes when loaded from file. """
-        for attr in ['expectations', 'nfevs', 'initial_params', 'opt_params', 'alphas']:
-            dd = defaultdict(list, getattr(self, attr))
-            setattr(self, attr, dd)
-
 
 class SingleTrialResult(BaseResult):
-    expectations: dict[int, float] = Field(default_factory=ddl_wrapper)
-    nfevs: dict[int, int] = Field(default_factory=ddl_wrapper)
-    initial_params: dict[int, list[float]] = Field(default_factory=ddl_wrapper)
-    opt_params: dict[int, list[float]] = Field(default_factory=ddl_wrapper)
-    alphas: dict[int, float] = Field(default_factory=ddl_wrapper)
+    expectations: dict[int, float] = Field(default_factory=dict)
+    nfevs: dict[int, int] = Field(default_factory=dict)
+    initial_params: dict[int, list[float]] = Field(default_factory=dict)
+    opt_params: dict[int, list[float]] = Field(default_factory=dict)
+    alphas: dict[int, float] = Field(default_factory=dict)
 
     def compute_alpha(self) -> None:
         for p, exp in self.expectations.items():
             self.alphas[p] = exp / self.true_obj
+
+
+class TQAResult(SingleTrialResult):
+    delta_t: dict[int, float] = Field(default_factory=dict)
 
 
 class MultipleTrialResult(BaseResult):
@@ -53,14 +51,12 @@ class MultipleTrialResult(BaseResult):
         for p, exps in self.expectations.items():
             self.alphas[p] = (np.asarray(exps) / self.true_obj).tolist()
 
+    def init_defaultdict(self) -> None:
+        """ Initialize defaultdict for the attributes when loaded from file. """
+        for attr in ['expectations', 'nfevs', 'initial_params', 'opt_params', 'alphas']:
+            dd = defaultdict(list, getattr(self, attr))
+            setattr(self, attr, dd)
 
-class ItlwResult(BaseResult):
-    expectations: dict[int, list[float]] = Field(default_factory=ddl_wrapper)
-    nfevs: dict[int, list[int]] = Field(default_factory=ddl_wrapper)
-    initial_params: dict[int, list[list[float]]] = Field(default_factory=ddl_wrapper)
-    opt_params: dict[int, list[list[float]]] = Field(default_factory=ddl_wrapper)
-    alphas: dict[int, list[float]] = Field(default_factory=ddl_wrapper)
 
-    def compute_alpha(self) -> None:
-        for p, exps in self.expectations.items():
-            self.alphas[p] = (np.asarray(exps) / self.true_obj).tolist()
+class ItlwResult(MultipleTrialResult):
+    pass
