@@ -6,6 +6,7 @@ from pathlib import Path
 from collections import defaultdict
 
 from qaoalib.utils import maxcut_brute, graph_from_name
+from qaoalib.json import to_serializable
 
 ddl_wrapper = lambda : defaultdict(list)
 
@@ -21,7 +22,7 @@ class BaseResult(BaseModel):
     def dump(self, target_dir='.') -> None:
         target_dir = Path(target_dir)
         with open(target_dir/f'{self.name}.json', 'w') as f:
-            json.dump(self.dict(), f)
+            json.dump(self.dict(), f, default=to_serializable)
 
 
 class SingleTrialResult(BaseResult):
