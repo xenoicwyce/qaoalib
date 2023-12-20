@@ -21,6 +21,8 @@ class BaseResult(BaseModel):
 
     def dump(self, target_dir='.') -> None:
         target_dir = Path(target_dir)
+        if not target_dir.exists():
+            target_dir.mkdir(parents=True)
         with open(target_dir/f'{self.name}.json', 'w') as f:
             json.dump(self.dict(), f, default=to_serializable)
 
