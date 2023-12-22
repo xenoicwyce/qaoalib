@@ -1,4 +1,5 @@
 import numpy as np
+import networkx as nx
 import json
 
 from pydantic import BaseModel, Field
@@ -18,6 +19,18 @@ class BaseResult(BaseModel):
     def solve_brute(self) -> None:
         G = graph_from_name(self.name)
         self.true_obj, _ = maxcut_brute(G)
+
+    def solve_gurobi(self) -> None:
+        from qiskit_optimization.algorithms import GurobiOptimizer
+        from qiskit_optimization.applications import Maxcut
+        
+        G = graph_from_name(self.name)
+        w = nx.adjacency_matrix(G)
+        maxcut = Maxcut(w)
+        qp = maxcut.to_quadratic_program()
+
+        grb_result = GurobiOptimizer().solve(qp)
+        self.true_obj = int(grb_result.fval)
 
     def dump(self, target_dir='.') -> None:
         target_dir = Path(target_dir)
