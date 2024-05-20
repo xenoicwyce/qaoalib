@@ -77,6 +77,7 @@ class MultipleTrialResult(BaseResult):
 class ItlwResult(MultipleTrialResult):
     pass
 
+
 class VQEResult(BaseResult):
     expectations: list[float] = Field(default_factory=list)
     nfevs: list[int] = Field(default_factory=list)
