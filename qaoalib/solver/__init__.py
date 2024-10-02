@@ -1,1 +1,1 @@
-from vqe import VQE
+from .vqe import VQE
