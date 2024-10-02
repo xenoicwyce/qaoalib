@@ -22,10 +22,15 @@ setup(
     packages=find_packages(exclude=["test*"]),
     python_requires=">=3.9",
     install_requires=[
-        "numpy>=1.17",
+        "qiskit",
+        "qiskit_optimization",
+        "qiskit_aer",
+        "numpy==1.26.0",
+        "scipy",
+        "pytest",
+        "pytest-cov",
         "matplotlib",
         "networkx",
-        "qiskit>=0.25.0",
         "pydantic",
-    ]
+    ],
 )
