@@ -21,8 +21,7 @@ class VQE:
     def __init__(
         self,
         quadratic_program: QuadraticProgram,
-        ansatz: QuantumCircuit = None,
-        reps: int = 1,
+        ansatz: QuantumCircuit,
         shots: int = None,
         sampler=None,
         estimator=None,
@@ -37,7 +36,7 @@ class VQE:
         self.offset: float = offset
 
         self.num_qubits = hamiltonian.num_qubits
-        self.ansatz = self.generate_full_ansatz(hamiltonian.num_qubits, reps) if ansatz is None else ansatz
+        self.ansatz = ansatz
 
         backend_sv = AerSimulator(method='statevector')
         backend_mps = AerSimulator(method='matrix_product_state')
@@ -48,23 +47,6 @@ class VQE:
 
         self.optimal_params = None
         self.optimal_solution = None
-    
-    @staticmethod
-    def generate_full_ansatz(num_qubits: int, reps: int) -> QuantumCircuit:
-        qc = QuantumCircuit(num_qubits)
-        theta = ParameterVector('θ', (reps + 1) * num_qubits)
-        
-        for k in range(num_qubits):
-            qc.ry(theta[k], k)
-
-        for r in range(1, reps + 1):
-            for k in range(num_qubits):
-                qc.cz(k, (k + 1) % num_qubits)
-
-            for k in range(num_qubits):
-                qc.ry(theta[r * num_qubits + k], k)
-
-        return qc
     
     def generate_random_params(self, scale=TWO_PI):
         return np.random.rand(self.ansatz.num_parameters) * scale
