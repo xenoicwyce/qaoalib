@@ -10,6 +10,20 @@ pip install --upgrade qaoalib
 ```
 
 # Usage
+Solving Max-cut with VQE:
+```
+from qaoalib.solver import VQE
+from qiskit_optimization.applications import Maxcut
+
+G = nx.random_regular_graph(3, 6) # 3-regular graph wtih 6 nodes
+qp = Maxcut(G).to_quadratic_program()
+ansatz = # some preferred ansatz
+solver = VQE(qp, ansatz)
+result = solver.solve()
+print(result)
+```
+
+# Usage (legacy)
 Calculate Max-cut expectation with `Qmc` or `QmcFastKron` (faster version):
 ```
 import networkx as nx
