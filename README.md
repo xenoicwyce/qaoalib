@@ -1,11 +1,7 @@
 # qaoalib
-A package for QAOA Max-cut Calculations.
+Implementations of VQA simulations for combinatorial optimization (mainly with graph and Max-cut).
 
-Packages required:
-- numpy
-- networkx
-- matplotlib
-- qiskit
+v0.2 works towards adapting the circuit simulations with Qiskit primitives: `Sampler` and `Estimator`.
 
 # How to install
 You can install from the PyPI:
