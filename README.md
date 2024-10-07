@@ -1,7 +1,7 @@
 # qaoalib
 Implementations of VQA simulations for combinatorial optimization (mainly with graph and Max-cut).
 
-v0.2 works towards adapting the circuit simulations with Qiskit primitives: `Sampler` and `Estimator`.
+v0.2 works towards adapting the circuit simulations with new Qiskit primitives: `Sampler` and `Estimator` (starting from Qiskit 1.0).
 
 # How to install
 You can install from the PyPI:
