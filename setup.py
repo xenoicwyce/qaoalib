@@ -3,9 +3,10 @@ from setuptools import setup, find_packages
 with open("README.md", "r", encoding="utf-8") as fh:
     long_description = fh.read()
 
-exec(open('qaoalib/version.py').read()) # puts __version__ into the namespace
+with open("qaoalib/version.py", "r") as f:
+    __version__ = f.read().strip()
 
-with open('requirements.txt', 'r')  as f:
+with open("requirements.txt", "r")  as f:
     requirements = [package.rstrip() for package in f]
 
 setup(
