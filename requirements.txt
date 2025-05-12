@@ -1,0 +1,11 @@
+qiskit<2.0
+qiskit_optimization
+qiskit_algorithms
+qiskit_aer
+numpy<2.0
+scipy
+pytest
+pytest-cov
+matplotlib
+networkx
+pydantic

@@ -5,6 +5,9 @@ with open("README.md", "r", encoding="utf-8") as fh:
 
 exec(open('qaoalib/version.py').read()) # puts __version__ into the namespace
 
+with open('requirements.txt', 'r')  as f:
+    requirements = [package.rstrip() for package in f]
+
 setup(
     name="qaoalib",
     version=__version__,
