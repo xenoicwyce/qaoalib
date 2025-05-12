@@ -25,7 +25,7 @@ class VQE:
         shots: int = None,
         sampler=None,
         estimator=None,
-        optimizer=None,        
+        optimizer=None,
     ) -> None:
         self.qp = quadratic_program
         self.converter = QuadraticProgramToQubo()
@@ -47,16 +47,16 @@ class VQE:
 
         self.optimal_params = None
         self.optimal_solution = None
-    
+
     def generate_random_params(self, scale=TWO_PI):
         return np.random.rand(self.ansatz.num_parameters) * scale
-    
+
     def generate_pubs(
-        self, 
+        self,
         params: list[float] | np.ndarray,
     ) -> list[tuple[QuantumCircuit, SparsePauliOp, np.ndarray]]:
         return [(self.ansatz, self.hamiltonian, params)]
-    
+
     def compute_energy(self, params: list[float] | np.ndarray) -> float:
         """
         Computes the sum of expectation of the ZZ terms.
@@ -65,14 +65,14 @@ class VQE:
         results = self.estimator.run(pubs).result()
         evs = [result.data.evs for result in results]
         return sum(evs)
-    
+
     def _sample_optimal_circuit(self) -> dict[str, int]:
         """
-        Run the full circuit with sampler to get the solution. 
+        Run the full circuit with sampler to get the solution.
         """
         if self.optimal_params is None:
             raise ValueError('Problem not yet solved. Run LCCVQE.solve() to solve the problem.')
-        
+
         ansatz = self.ansatz.copy()
         ansatz.measure_all()
         result = self.sampler.run([(ansatz, self.optimal_params)], shots=self.shots).result()[0]
@@ -85,13 +85,13 @@ class VQE:
         for bit_string, count in counts.items():
             if count == highest_count:
                 return list(map(int, bit_string[::-1])) # flip the bit-string due to qiskit ordering
-            
+
     def get_qp_solution(self) -> list[float]:
         qubo_solution = self._sample_most_likely()
         return self.converter.interpret(qubo_solution)
 
     def solve(
-        self, 
+        self,
         initial_point: list[float] | np.ndarray = None,
         run_sampler: bool = False,
     ) -> OptimizerResult:
@@ -102,7 +102,7 @@ class VQE:
             initial_point = self.generate_random_params()
         else:
             assert np.asarray(initial_point).shape[0] == self.ansatz.num_parameters, 'Parameter length does not match.'
-        
+
         def obj_func(params):
             return self.compute_energy(params)
 
