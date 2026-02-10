@@ -12,6 +12,7 @@ pip install --upgrade qaoalib
 # Usage
 Solving Max-cut with VQE:
 ```
+import networkx as nx
 from qaoalib.solver import VQE
 from qiskit_optimization.applications import Maxcut
 
