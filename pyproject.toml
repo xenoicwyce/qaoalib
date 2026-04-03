@@ -1,0 +1,26 @@
+[build-system]
+requires = ["setuptools", "wheel", "numpy", "networkx"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "qaoalib"
+version = "0.3.1"
+description = "A package for QAOA Maxcut calculations"
+readme = "README.md"
+requires-python = ">=3.9"
+dependencies = [
+    "numpy",
+    "scipy",
+    "qiskit",
+    "qiskit_optimization",
+    "qiskit_algorithms",
+    "qiskit_aer",
+    "pytest",
+    "pytest-cov",
+    "matplotlib",
+    "networkx",
+    "pydantic",
+]
+
+[project.urls]
+Homepage = "https://github.com/xenoicwyce/qaoalib"

@@ -1,2 +1,4 @@
-from .version import __version__
+from importlib.metadata import version
 from .utils import *
+
+__version__ = version("qaoalib")
