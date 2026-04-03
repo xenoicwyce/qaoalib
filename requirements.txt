@@ -1,8 +1,8 @@
-qiskit<2.0
+qiskit
 qiskit_optimization
 qiskit_algorithms
 qiskit_aer
-numpy<2.0
+numpy
 scipy
 pytest
 pytest-cov

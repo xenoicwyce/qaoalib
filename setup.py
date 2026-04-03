@@ -6,8 +6,8 @@ with open("README.md", "r", encoding="utf-8") as fh:
 with open("qaoalib/version.py", "r") as f:
     __version__ = f.read().strip()
 
-with open("requirements.txt", "r")  as f:
-    requirements = [package.rstrip() for package in f]
+with open("requirements.txt", "r") as f:
+    requirements = [package.strip() for package in f]
 
 setup(
     name="qaoalib",
@@ -25,16 +25,5 @@ setup(
     ],
     packages=find_packages(exclude=["test*"]),
     python_requires=">=3.9",
-    install_requires=[
-        "qiskit",
-        "qiskit_optimization",
-        "qiskit_aer",
-        "numpy==1.26.0",
-        "scipy",
-        "pytest",
-        "pytest-cov",
-        "matplotlib",
-        "networkx",
-        "pydantic",
-    ],
+    install_requires=requirements,
 )
